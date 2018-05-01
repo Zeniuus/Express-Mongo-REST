@@ -1,0 +1,9 @@
+# Mac OS X
+.DS_Store
+
+# Jetbrain products
+.idea/
+
+# npm
+node_modules/
+package-lock.json

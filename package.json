@@ -1,0 +1,33 @@
+{
+  "name": "express-mongo-rest",
+  "version": "1.0.0",
+  "description": "Framework for creating super-easy and super-fast REST API server on Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "./node_modules/.bin/eslint .",
+    "start": "./node_modules/.bin/babel-node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zeniuus/Express-Mongo-REST.git"
+  },
+  "keywords": [
+    "Node.js",
+    "Express.js",
+    "MongoDB"
+  ],
+  "author": "Zeniuus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Zeniuus/Express-Mongo-REST/issues"
+  },
+  "homepage": "https://github.com/Zeniuus/Express-Mongo-REST#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0"
+  }
+}

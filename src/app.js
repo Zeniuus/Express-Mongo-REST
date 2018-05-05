@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
+import mongoose from 'mongoose';
 
 const callingScriptDirectory = function callingScriptDirectory() {
   let _module = module;
@@ -15,12 +16,20 @@ const callingScriptDirectory = function callingScriptDirectory() {
 };
 
 const expressMongoRest = {
-  runserver(port = 8000) {
+  runserver({ appName = 'express-mongo-rest', port = 8000 }) {
     const app = express();
 
     /* Middleware settings. */
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
+
+    /* Create a Mongod connection. */
+    const db = mongoose.connection;
+    db.once('open', () => {
+      console.log('Connected to mongod server');
+    });
+    db.on('error', console.error);
+    mongoose.connect(`mongodb://localhost/${appName.replace(' ', '-')}`);
 
     /* Register API routers from user's source code. */
     const currDir = callingScriptDirectory();

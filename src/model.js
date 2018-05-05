@@ -1,7 +1,9 @@
-const mongoSchema = function convertToMongoSchema(schema) {
-  return Object.keys(schema).reduce((_mongoSchema, field) => {
+import mongoose from 'mongoose';
+
+const createMongoSchema = function convertToMongoSchema(schema) {
+  return Object.keys(schema).reduce((mongoSchema, field) => {
     return {
-      ..._mongoSchema,
+      ...mongoSchema,
       [field]: schema[field].constructor,
     };
   }, {});
@@ -9,11 +11,13 @@ const mongoSchema = function convertToMongoSchema(schema) {
 
 /* eslint-disable-next-line import/prefer-default-export */
 export const createModel = function createMongoModel(name, schema) {
-  const newModel = {
+  const mongoSchema = new mongoose.Schema(createMongoSchema(schema));
+  const mongoModel = mongoose.model(name, mongoSchema);
+  const model = {
     name,
     schema,
-    mongoSchema: mongoSchema(schema),
+    mongoModel,
   };
 
-  return newModel;
+  return model;
 };

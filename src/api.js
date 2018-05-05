@@ -12,36 +12,105 @@ export const Actions = {
   LIST: {
     method: 'get',
     url: resourceUrl,
-    handleRouter(req, res) {
-      res.end('list');
+    handleRouter(model) {
+      return async (req, res) => {
+        const Model = model.mongoModel;
+
+        let objects;
+        try {
+          objects = await Model.find({});
+        } catch (err) {
+          return res.status(500).end(err);
+        }
+
+        res.json(objects);
+      };
     },
   },
   CREATE: {
     method: 'post',
     url: resourceUrl,
-    handleRouter(req, res) {
-      res.end('create');
+    handleRouter(model) {
+      const defaultObj = function createDefaultObject(schema) {
+        return Object.keys(schema).reduce((_defaultObj, field) => {
+          if (schema[field].defaultValue) {
+            return {
+              ..._defaultObj,
+              [field]: schema[field].defaultValue,
+            };
+          }
+          return _defaultObj;
+        }, {});
+      };
+
+      return async (req, res) => {
+        const { schema, mongoModel: Model } = model;
+
+        const newModel = new Model(defaultObj(schema));
+        Object.assign(newModel, req.body);
+        try {
+          await newModel.save();
+        } catch (err) {
+          return res.status(500).end(err);
+        }
+
+        res.status(201).json(newModel);
+      };
     },
   },
   RETRIEVE: {
     method: 'get',
     url: singleResourceUrl,
-    handleRouter(req, res) {
-      res.end('retrieve');
+    handleRouter(model) {
+      return async (req, res) => {
+        const Model = model.mongoModel;
+
+        let object;
+        try {
+          object = await Model.findOne({ _id: req.params.modelId });
+        } catch (err) {
+          return res.status(500).end(err);
+        }
+
+        res.json(object);
+      };
     },
   },
   UPDATE: {
     method: 'put',
     url: singleResourceUrl,
-    handleRouter(req, res) {
-      res.end('update');
+    handleRouter(model) {
+      return async (req, res) => {
+        const Model = model.mongoModel;
+
+        let object;
+        try {
+          object = await Model.findOne({ _id: req.params.modelId });
+          Object.assign(object, req.body);
+          await object.save();
+        } catch (err) {
+          return res.status(500).end(err);
+        }
+
+        res.json(object);
+      };
     },
   },
   DELETE: {
     method: 'delete',
     url: singleResourceUrl,
-    handleRouter(req, res) {
-      res.end('delete');
+    handleRouter(model) {
+      return async (req, res) => {
+        const Model = model.mongoModel;
+
+        try {
+          await Model.remove({ _id: req.params.modelId });
+        } catch (err) {
+          return res.status(500).end(err);
+        }
+
+        res.status(204).end();
+      };
     },
   },
 };
@@ -65,7 +134,7 @@ export const createApi = function createExpressRouter({
   const router = express.Router();
   router.mountPath = mountPath;
   actions.forEach((action) => {
-    router[action.method](`${action.url(model)}`, action.handleRouter);
+    router[action.method](`${action.url(model)}`, action.handleRouter(model));
   });
 
   return router;

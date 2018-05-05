@@ -27,8 +27,8 @@ const expressMongoRest = {
     const models = fs.readdirSync(path.join(currDir, 'models'));
     models.forEach((model) => {
       /* eslint-disable */
-      const routes = require(path.join(currDir, 'apis', model)).default;
-      app.use(routes);
+      const router = require(path.join(currDir, 'apis', model)).default;
+      app.use(router.mountPath, router);
       /* eslint-enable */
     });
 
